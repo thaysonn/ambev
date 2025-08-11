@@ -1,4 +1,5 @@
 using Ambev.DeveloperEvaluation.Application;
+using Ambev.DeveloperEvaluation.Application.Sales.CreateSale;
 using Ambev.DeveloperEvaluation.Common.HealthChecks;
 using Ambev.DeveloperEvaluation.Common.Logging;
 using Ambev.DeveloperEvaluation.Common.Security;
@@ -9,6 +10,7 @@ using Ambev.DeveloperEvaluation.WebApi.Middleware;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using FluentValidation;
 
 namespace Ambev.DeveloperEvaluation.WebApi;
 
@@ -28,6 +30,12 @@ public class Program
 
             builder.AddBasicHealthChecks();
             builder.Services.AddSwaggerGen();
+
+            //todo: remover
+            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
+
+            Console.WriteLine("migrations" + builder.Configuration.GetConnectionString("DefaultConnection"));
+            Console.WriteLine("environment 2" + environment);
 
             builder.Services.AddDbContext<DefaultContext>(options =>
                 options.UseNpgsql(
@@ -50,10 +58,18 @@ public class Program
                 );
             });
 
+            builder.Services.AddValidatorsFromAssemblyContaining<CreateSaleCommandValidator>(); 
             builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-
+  
             var app = builder.Build();
             app.UseMiddleware<ValidationExceptionMiddleware>();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetService<DefaultContext>();
+                if (db.Database.GetPendingMigrations().Any())
+                    db.Database.Migrate();
+            }
 
             if (app.Environment.IsDevelopment())
             {
