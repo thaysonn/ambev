@@ -33,7 +33,7 @@ public class CreateSaleCommandValidator : AbstractValidator<CreateSaleCommand>
             .SetValidator(new CreateSaleItemValidator());
     }
 
-    private sealed class CreateSaleItemValidator : AbstractValidator<CreateSaleItemDto>
+    private sealed class CreateSaleItemValidator : AbstractValidator<CreateSaleItemResult>
     {
         public CreateSaleItemValidator()
         {

@@ -18,11 +18,10 @@ public class UpdateSaleCommandValidator : AbstractValidator<UpdateSaleCommand>
         RuleForEach(x => x.Items).SetValidator(new UpdateSaleItemValidator());
     }
 
-    private sealed class UpdateSaleItemValidator : AbstractValidator<UpdateSaleItemDto>
+    private sealed class UpdateSaleItemValidator : AbstractValidator<UpdateSaleItemResult>
     {
         public UpdateSaleItemValidator()
         {
-            // Id pode ser nulo para novos itens
             RuleFor(i => i.Product).NotEmpty().MaximumLength(200);
             RuleFor(i => i.Quantity).InclusiveBetween(1, 20);
             RuleFor(i => i.UnitPrice).GreaterThan(0m);

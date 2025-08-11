@@ -11,10 +11,10 @@ public class CreateSaleCommand : IRequest<CreateSaleResult>
     public DateTime Date { get; set; }
     public string Customer { get; set; } = string.Empty;
     public string Branch { get; set; } = string.Empty;
-    public List<CreateSaleItemDto> Items { get; set; } = new();
+    public List<CreateSaleItemResult> Items { get; set; } = new();
 }
 
-public class CreateSaleItemDto
+public class CreateSaleItemResult
 {
     public string Product { get; set; } = string.Empty;
     public int Quantity { get; set; }

@@ -1,19 +1,18 @@
-
 using Ambev.DeveloperEvaluation.Application.Sales.Shared;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
 using MediatR;
 
 namespace Ambev.DeveloperEvaluation.Application.Sales.GetAllSales;
 
-public class GetAllSalesQueryHandler : IRequestHandler<GetAllSalesQuery, List<SaleDto>>
+public class GetAllSalesQueryHandler : IRequestHandler<GetAllSalesQuery, List<SaleResult>>
 {
     private readonly ISaleRepository _repo;
     public GetAllSalesQueryHandler(ISaleRepository repo) { _repo = repo; }
 
-    public async Task<List<SaleDto>> Handle(GetAllSalesQuery request, CancellationToken cancellationToken)
+    public async Task<List<SaleResult>> Handle(GetAllSalesQuery request, CancellationToken cancellationToken)
     {
         var sales = await _repo.GetAllAsync(cancellationToken);
-        return sales.Select(sale => new SaleDto
+        return sales.Select(sale => new SaleResult
         {
             Id = sale.Id,
             SaleNumber = sale.SaleNumber,
@@ -22,7 +21,7 @@ public class GetAllSalesQueryHandler : IRequestHandler<GetAllSalesQuery, List<Sa
             Branch = sale.Branch,
             TotalAmount = sale.TotalAmount,
             Cancelled = sale.Cancelled,
-            Items = sale.Items.Select(i => new SaleItemDto
+            Items = sale.Items.Select(i => new SaleItemResult
             {
                 Product = i.Product,
                 Quantity = i.Quantity,

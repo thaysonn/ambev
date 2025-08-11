@@ -9,10 +9,10 @@ public class UpdateSaleCommand : IRequest<UpdateSaleResult>
     public DateTime Date { get; set; }
     public string Customer { get; set; } = string.Empty;
     public string Branch { get; set; } = string.Empty;
-    public List<UpdateSaleItemDto> Items { get; set; } = new();
+    public List<UpdateSaleItemResult> Items { get; set; } = new();
 }
 
-public class UpdateSaleItemDto
+public class UpdateSaleItemResult
 {
     public string Product { get; set; } = string.Empty;
     public int Quantity { get; set; }

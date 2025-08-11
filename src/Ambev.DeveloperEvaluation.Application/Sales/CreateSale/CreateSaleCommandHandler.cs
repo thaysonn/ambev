@@ -1,7 +1,9 @@
 using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.Domain.Events;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
+using Ambev.DeveloperEvaluation.Domain.Policies;
 using MediatR;
+using static Ambev.DeveloperEvaluation.Domain.ValueObjects.Money;
 
 namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale;
  
@@ -9,10 +11,12 @@ public class CreateSaleCommandHandler : IRequestHandler<CreateSaleCommand, Creat
 {
     private readonly ISaleRepository _repo;
     private readonly IMediator _mediator;
-    public CreateSaleCommandHandler(ISaleRepository repo, IMediator mediator)
+    private readonly IDiscountPolicy _discountPolicy;
+    public CreateSaleCommandHandler(ISaleRepository repo, IMediator mediator, IDiscountPolicy discountPolicy)
     {
         _repo = repo;
         _mediator = mediator;
+        _discountPolicy = discountPolicy;
     }
 
     public async Task<CreateSaleResult> Handle(CreateSaleCommand request, CancellationToken cancellationToken)
@@ -38,7 +42,12 @@ public class CreateSaleCommandHandler : IRequestHandler<CreateSaleCommand, Creat
                     Product = i.Product,
                     Cancelled = false
                 };
-                saleItem.UpdateValues(i.Quantity, i.UnitPrice);
+                var percent = _discountPolicy.GetPercent(i.Quantity);
+                var discount = Round2(i.Quantity * i.UnitPrice * percent);
+                saleItem.Quantity = i.Quantity;
+                saleItem.UnitPrice = i.UnitPrice;
+                saleItem.Discount = discount;
+                saleItem.Total = Round2(i.Quantity * i.UnitPrice - discount);
                 return saleItem;
             }).ToList()
         };
