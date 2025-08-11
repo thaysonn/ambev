@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace Ambev.DeveloperEvaluation.Application.SalesItem.UpdateSalesItem
 {
-    public class UpdateSaleItemCommandValidator : AbstractValidator<AddSaleItemCommand>
+    public class UpdateSaleItemCommandValidator : AbstractValidator<UpdateSaleItemCommand>
     {
         public UpdateSaleItemCommandValidator()
         {

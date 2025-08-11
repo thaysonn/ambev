@@ -7,6 +7,7 @@ namespace Ambev.DeveloperEvaluation.Application.SalesItem.UpdateSalesItem
         public Guid SaleId { get; set; }
         public Guid ItemId { get; set; }
         public int Quantity { get; set; }
+        public string Product { get; set; }
         public decimal UnitPrice { get; set; }  
     }
 }
