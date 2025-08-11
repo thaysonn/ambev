@@ -1,5 +1,4 @@
 using Ambev.DeveloperEvaluation.Application;
-using Ambev.DeveloperEvaluation.Application.Sales.CreateSale;
 using Ambev.DeveloperEvaluation.Application.Sales.UpdateSale;
 using Ambev.DeveloperEvaluation.Application.SalesItem.CreateSalesItem;
 using Ambev.DeveloperEvaluation.Application.SalesItem.UpdateSalesItem;
@@ -14,13 +13,12 @@ using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-using static CreateSaleCommandValidator;
 
 namespace Ambev.DeveloperEvaluation.WebApi;
 
 public class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         try
         {
@@ -66,12 +64,7 @@ public class Program
             var app = builder.Build();
             app.UseMiddleware<ValidationExceptionMiddleware>();
 
-            using (var scope = app.Services.CreateScope())
-            {
-                var db = scope.ServiceProvider.GetService<DefaultContext>();
-                if (db.Database.GetPendingMigrations().Any())
-                    db.Database.Migrate();
-            }
+            await app.ApplyMigrationsAsync();
 
             if (app.Environment.IsDevelopment())
             {
