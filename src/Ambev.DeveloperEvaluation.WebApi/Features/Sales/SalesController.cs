@@ -6,7 +6,7 @@ using Ambev.DeveloperEvaluation.Application.Sales.UpdateSale;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Ambev.DeveloperEvaluation.WebApi.Controllers;
+namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales;
 
 [ApiController]
 [Route("api/[controller]")]

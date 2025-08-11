@@ -23,7 +23,7 @@ public class CancelSaleCommandHandler : IRequestHandler<CancelSaleCommand, Cance
             return new CancelSaleResult { Success = false, Errors = new[] { "Sale already cancelled" } };
        
         sale.Cancelled = true;
-        
+
         if (sale.Items != null)
             foreach (var item in sale.Items)
                 item.Cancelled = true;
