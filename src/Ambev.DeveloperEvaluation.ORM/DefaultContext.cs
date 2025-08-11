@@ -1,19 +1,20 @@
 ﻿using Ambev.DeveloperEvaluation.Domain.Entities;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Design;
-using Microsoft.Extensions.Configuration;
 using System.Reflection;
 
 namespace Ambev.DeveloperEvaluation.ORM;
 
 public class DefaultContext : DbContext
 {
+    private readonly IMediator _mediator;
     public DbSet<User> Users { get; set; }
     public DbSet<Sale> Sales { get; set; }
     public DbSet<SaleItem> SaleItems { get; set; }
 
-    public DefaultContext(DbContextOptions<DefaultContext> options) : base(options)
+    public DefaultContext(DbContextOptions<DefaultContext> options, IMediator mediator) : base(options)
     {
+        _mediator = mediator;
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -25,29 +26,11 @@ public class DefaultContext : DbContext
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         base.OnModelCreating(modelBuilder);
     }
-}
-public class YourDbContextFactory : IDesignTimeDbContextFactory<DefaultContext>
-{
-    public DefaultContext CreateDbContext(string[] args)
+
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-          var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
+        await _mediator.DispatchDomainEvents(this);
 
-        Console.WriteLine("environment 2" + environment);
-        IConfigurationRoot configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{environment}.json", optional: true) // <- adiciona env
-                .AddEnvironmentVariables() // <- também lê direto do env
-                .Build();
-
-        var builder = new DbContextOptionsBuilder<DefaultContext>();
-        var connectionString = configuration.GetConnectionString("DefaultConnection");
-
-        builder.UseNpgsql(
-               connectionString,
-                b => b.MigrationsAssembly("Ambev.DeveloperEvaluation.ORM")
-        );
-
-        return new DefaultContext(builder.Options);
+        return await base.SaveChangesAsync(cancellationToken);
     }
 }

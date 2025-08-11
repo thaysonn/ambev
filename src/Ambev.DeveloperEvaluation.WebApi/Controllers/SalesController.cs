@@ -1,5 +1,5 @@
+using Ambev.DeveloperEvaluation.Application.Sales.CancelSale;
 using Ambev.DeveloperEvaluation.Application.Sales.CreateSale;
-using Ambev.DeveloperEvaluation.Application.Sales.DeleteSale;
 using Ambev.DeveloperEvaluation.Application.Sales.GetAllSales;
 using Ambev.DeveloperEvaluation.Application.Sales.GetSaleById;
 using Ambev.DeveloperEvaluation.Application.Sales.UpdateSale;
@@ -28,18 +28,18 @@ public class SalesController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = result.SaleId }, result);
     }
 
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        var result = await _mediator.Send(new GetAllSalesQuery());
+        return Ok(result);
+    }
+
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(Guid id)
     {
         var result = await _mediator.Send(new GetSaleByIdQuery { Id = id });
         if (result == null) return NotFound();
-        return Ok(result);
-    }
-
-    [HttpGet]
-    public async Task<IActionResult> GetAll()
-    {
-        var result = await _mediator.Send(new GetAllSalesQuery());
         return Ok(result);
     }
 
@@ -53,10 +53,10 @@ public class SalesController : ControllerBase
         return NoContent();
     }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(Guid id)
+    [HttpPatch("{id}/cancel")]
+    public async Task<IActionResult> Cancel(Guid id)
     {
-        var result = await _mediator.Send(new DeleteSaleCommand { Id = id });
+        var result = await _mediator.Send(new CancelSaleCommand { Id = id });
         if (!result.Success) return BadRequest(new { errors = result.Errors });
         return NoContent();
     }

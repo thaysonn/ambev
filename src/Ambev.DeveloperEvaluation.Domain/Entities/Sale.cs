@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
+using Ambev.DeveloperEvaluation.Domain.Common;
 using Ambev.DeveloperEvaluation.Domain.Enums;
 
 namespace Ambev.DeveloperEvaluation.Domain.Entities;
 
-public class Sale
+public class Sale : BaseEntity
 {
     public Guid Id { get; set; }
     public string SaleNumber { get; set; } = string.Empty;

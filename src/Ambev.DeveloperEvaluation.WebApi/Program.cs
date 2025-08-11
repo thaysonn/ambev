@@ -31,12 +31,6 @@ public class Program
             builder.AddBasicHealthChecks();
             builder.Services.AddSwaggerGen();
 
-            //todo: remover
-            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
-
-            Console.WriteLine("migrations" + builder.Configuration.GetConnectionString("DefaultConnection"));
-            Console.WriteLine("environment 2" + environment);
-
             builder.Services.AddDbContext<DefaultContext>(options =>
                 options.UseNpgsql(
                     builder.Configuration.GetConnectionString("DefaultConnection"),

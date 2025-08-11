@@ -1,11 +1,10 @@
-
 using Ambev.DeveloperEvaluation.Common.Validation;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
 using Ambev.DeveloperEvaluation.Domain.Entities;
+using Ambev.DeveloperEvaluation.Domain.Events;
 using MediatR;
 
 namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale;
-
 
 public class UpdateSaleCommandHandler : IRequestHandler<UpdateSaleCommand, UpdateSaleResult>
 {
@@ -36,8 +35,9 @@ public class UpdateSaleCommandHandler : IRequestHandler<UpdateSaleCommand, Updat
         }).ToList();
         sale.TotalAmount = sale.Items.Sum(x => x.Total);
 
+        sale.AddDomainEvent(new SaleUpdatedEvent(sale));
         await _repo.UpdateAsync(sale, cancellationToken);
-        await _repo.SaveChangesAsync(cancellationToken);
+        await _repo.SaveChangesAsync(cancellationToken); 
 
         return new UpdateSaleResult { Success = true };
     }

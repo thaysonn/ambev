@@ -6,21 +6,26 @@ public class UpdateSaleCommandValidator : AbstractValidator<UpdateSaleCommand>
 {
     public UpdateSaleCommandValidator()
     {
-        RuleFor(x => x.SaleNumber).NotEmpty();
-        RuleFor(x => x.Date).NotEmpty();
-        RuleFor(x => x.Customer).NotEmpty();
-        RuleFor(x => x.Branch).NotEmpty();
-        RuleFor(x => x.Items).NotEmpty();
-        RuleForEach(x => x.Items).SetValidator(new UpdateSaleItemDtoValidator());
-    }
-}
+        RuleFor(x => x.Id).NotEmpty();
 
-public class UpdateSaleItemDtoValidator : AbstractValidator<UpdateSaleItemDto>
-{
-    public UpdateSaleItemDtoValidator()
+        RuleFor(x => x.SaleNumber).NotEmpty().MaximumLength(50);
+        RuleFor(x => x.Date).NotEmpty().LessThanOrEqualTo(_ => DateTime.UtcNow.AddMinutes(5));
+        RuleFor(x => x.Customer).NotEmpty().MaximumLength(200);
+        RuleFor(x => x.Branch).NotEmpty().MaximumLength(200);
+
+        RuleFor(x => x.Items).NotEmpty();
+
+        RuleForEach(x => x.Items).SetValidator(new UpdateSaleItemValidator());
+    }
+
+    private sealed class UpdateSaleItemValidator : AbstractValidator<UpdateSaleItemDto>
     {
-        RuleFor(x => x.Product).NotEmpty();
-        RuleFor(x => x.Quantity).GreaterThan(0).LessThanOrEqualTo(20);
-        RuleFor(x => x.UnitPrice).GreaterThan(0);
+        public UpdateSaleItemValidator()
+        {
+            // Id pode ser nulo para novos itens
+            RuleFor(i => i.Product).NotEmpty().MaximumLength(200);
+            RuleFor(i => i.Quantity).InclusiveBetween(1, 20);
+            RuleFor(i => i.UnitPrice).GreaterThan(0m);
+        }
     }
 }

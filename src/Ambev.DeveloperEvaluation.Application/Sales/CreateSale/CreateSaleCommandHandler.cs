@@ -1,17 +1,18 @@
-
 using Ambev.DeveloperEvaluation.Domain.Entities;
+using Ambev.DeveloperEvaluation.Domain.Events;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
 using MediatR;
 
 namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale;
-
-
+ 
 public class CreateSaleCommandHandler : IRequestHandler<CreateSaleCommand, CreateSaleResult>
 {
     private readonly ISaleRepository _repo;
-    public CreateSaleCommandHandler(ISaleRepository repo)
+    private readonly IMediator _mediator;
+    public CreateSaleCommandHandler(ISaleRepository repo, IMediator mediator)
     {
         _repo = repo;
+        _mediator = mediator;
     }
 
     public async Task<CreateSaleResult> Handle(CreateSaleCommand request, CancellationToken cancellationToken)
@@ -45,27 +46,12 @@ public class CreateSaleCommandHandler : IRequestHandler<CreateSaleCommand, Creat
         };
         sale.TotalAmount = sale.Items.Sum(x => x.Total);
 
+        sale.AddDomainEvent(new SaleCreatedEvent(sale));
         await _repo.AddAsync(sale, cancellationToken);
         await _repo.SaveChangesAsync(cancellationToken);
-        // TODO: Publish SaleCreated event (log or event bus)
 
         return new CreateSaleResult { Success = true, SaleId = sale.Id, SaleNumber = sale.SaleNumber };
     }
-
-    //private decimal CalculateDiscount(int quantity, decimal unitPrice)
-    //{
-    //    if (quantity >= 10 && quantity <= 20)
-    //        return quantity * unitPrice * 0.2m;
-    //    if (quantity >= 4)
-    //        return quantity * unitPrice * 0.1m;
-    //    return 0m;
-    //}
-
-    //private decimal CalculateTotal(int quantity, decimal unitPrice)
-    //{
-    //    var discount = CalculateDiscount(quantity, unitPrice);
-    //    return quantity * unitPrice - discount;
-    //}
 
     private decimal CalculateDiscountAmount(int qty, decimal unitPrice)
     {
