@@ -1,5 +1,6 @@
 using Ambev.DeveloperEvaluation.Domain.Common;
 using Ambev.DeveloperEvaluation.Domain.ValueObjects;
+using Ambev.DeveloperEvaluation.Domain.Policies;
 
 namespace Ambev.DeveloperEvaluation.Domain.Entities;
 
@@ -36,5 +37,23 @@ public class SaleItem : BaseEntity
         var gross = quantity * unitPrice;
         var discount = CalculateDiscount(quantity, unitPrice);
         return Money.Round2(gross - discount);
+    }
+
+    // Novo método de fábrica
+    public static SaleItem Create(string product, int quantity, decimal unitPrice, IDiscountPolicy discountPolicy)
+    {
+        if (quantity > 20)
+            throw new InvalidOperationException($"Cannot sell more than 20 units of {product}");
+        var percent = discountPolicy.GetPercent(quantity);
+        var discount = Money.Round2(quantity * unitPrice * percent);
+        return new SaleItem
+        { 
+            Product = product,
+            Quantity = quantity,
+            UnitPrice = unitPrice,
+            Discount = discount,
+            Total = Money.Round2(quantity * unitPrice - discount),
+            Cancelled = false
+        };
     }
 }

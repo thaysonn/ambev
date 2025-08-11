@@ -8,23 +8,21 @@ public class UpdateSaleCommandValidator : AbstractValidator<UpdateSaleCommand>
     {
         RuleFor(x => x.Id).NotEmpty();
 
-        RuleFor(x => x.SaleNumber).NotEmpty().MaximumLength(50);
-        RuleFor(x => x.Date).NotEmpty().LessThanOrEqualTo(_ => DateTime.UtcNow.AddMinutes(5));
-        RuleFor(x => x.Customer).NotEmpty().MaximumLength(200);
-        RuleFor(x => x.Branch).NotEmpty().MaximumLength(200);
+        RuleFor(x => x.SaleNumber)
+              .NotEmpty().WithMessage("Sale number is required.")
+              .MaximumLength(50);
 
-        RuleFor(x => x.Items).NotEmpty();
+        RuleFor(x => x.Date)
+            .NotEmpty()
+            .LessThanOrEqualTo(_ => DateTime.UtcNow.AddMinutes(5))
+            .WithMessage("Date cannot be in the future.");
 
-        RuleForEach(x => x.Items).SetValidator(new UpdateSaleItemValidator());
-    }
+        RuleFor(x => x.Customer)
+            .NotEmpty().WithMessage("Customer is required.")
+            .MaximumLength(200);
 
-    private sealed class UpdateSaleItemValidator : AbstractValidator<UpdateSaleItemResult>
-    {
-        public UpdateSaleItemValidator()
-        {
-            RuleFor(i => i.Product).NotEmpty().MaximumLength(200);
-            RuleFor(i => i.Quantity).InclusiveBetween(1, 20);
-            RuleFor(i => i.UnitPrice).GreaterThan(0m);
-        }
+        RuleFor(x => x.Branch)
+            .NotEmpty().WithMessage("Branch is required.")
+            .MaximumLength(200); 
     }
 }

@@ -1,5 +1,8 @@
 using Ambev.DeveloperEvaluation.Application;
 using Ambev.DeveloperEvaluation.Application.Sales.CreateSale;
+using Ambev.DeveloperEvaluation.Application.Sales.UpdateSale;
+using Ambev.DeveloperEvaluation.Application.SalesItem.CreateSalesItem;
+using Ambev.DeveloperEvaluation.Application.SalesItem.UpdateSalesItem;
 using Ambev.DeveloperEvaluation.Common.HealthChecks;
 using Ambev.DeveloperEvaluation.Common.Logging;
 using Ambev.DeveloperEvaluation.Common.Security;
@@ -7,10 +10,11 @@ using Ambev.DeveloperEvaluation.Common.Validation;
 using Ambev.DeveloperEvaluation.IoC;
 using Ambev.DeveloperEvaluation.ORM;
 using Ambev.DeveloperEvaluation.WebApi.Middleware;
+using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-using FluentValidation;
+using static CreateSaleCommandValidator;
 
 namespace Ambev.DeveloperEvaluation.WebApi;
 
@@ -53,6 +57,10 @@ public class Program
             });
 
             builder.Services.AddValidatorsFromAssemblyContaining<CreateSaleCommandValidator>(); 
+            builder.Services.AddValidatorsFromAssemblyContaining<UpdateSaleCommandValidator>(); 
+            builder.Services.AddValidatorsFromAssemblyContaining<AddSaleItemCommandValidator>();
+            builder.Services.AddValidatorsFromAssemblyContaining<UpdateSaleItemCommandValidator>();
+
             builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
   
             var app = builder.Build();

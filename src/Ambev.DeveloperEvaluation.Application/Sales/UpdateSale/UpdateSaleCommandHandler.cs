@@ -24,18 +24,7 @@ public class UpdateSaleCommandHandler : IRequestHandler<UpdateSaleCommand, Updat
         sale.SaleNumber = request.SaleNumber;
         sale.Date = request.Date;
         sale.Customer = request.Customer;
-        sale.Branch = request.Branch;
-        sale.Items = request.Items.Select(i => {
-            var saleItem = new SaleItem
-            {
-                Id = Guid.NewGuid(),
-                Product = i.Product,
-                Cancelled = false
-            };
-            saleItem.UpdateValues(i.Quantity, i.UnitPrice);
-            return saleItem;
-        }).ToList();
-        sale.TotalAmount = sale.Items.Sum(x => x.Total);
+        sale.Branch = request.Branch; 
 
         sale.AddDomainEvent(new SaleUpdatedEvent(sale));
         await _repo.UpdateAsync(sale, cancellationToken);
